@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.bawei.dao.ArticleDao">
+    
+    <select id="select" resultMap="articleResultMap">
+  select a.*,u.username from cms_article a
+   left join cms_user u on a.user_id=u.id 
+   where a.id =#{id}
+
+
+</select>
+
+
+ <insert id="insert">
+ 
+ insert into cms_article(title,content,picture,channel_id,category_id,user_id,hits,hot,status,deleted,created,updated,summary)
+  values (#{title},#{content},#{picture},#{channelId},#{categoryId},#{userId},#{hits},#{hot},#{status},#{deleted},#{created},#{updated},#{summary})
+ 
+ </insert>
+ 
+ 
+ <resultMap type="Article" id="articleResultMap">
+   <!-- 封装主键 -->
+   <id column="id" property="id"/>
+   <!-- 封装普通属性 -->
+  <result column="title" property="title"/> 
+  <result column="content" property="content"/> 
+  <result column="picture" property="picture"/> 
+  <result column="channel_id" property="channelId"/> 
+  <result column="category_id" property="categoryId"/> 
+  <result column="user_id" property="userId"/> 
+  <result column="hits" property="hits"/> 
+  <result column="hot" property="hot"/> 
+  <result column="status" property="status"/> 
+  <result column="deleted" property="deleted"/> 
+  <result column="created" property="created"/> 
+  <result column="updated" property="updated"/> 
+  <result column="summary" property="summary"/> 
+  <!-- 封装一对一关系 -->
+    <!-- 用户 -->
+   <association property="user" javaType="User">
+     <id column="user_id" property="id"/>
+      <result column="username" property="username"/>
+   </association>
+    <!-- 栏目 -->
+   <association property="channel" javaType="Channel">
+     <id column="channel_id" property="id"/>
+      <result column="channel_name" property="name"/>
+   </association>
+   <!-- 分类 -->
+   <association property="category" javaType="category">
+     <id column="category_id" property="id"/>
+      <result column="category_name" property="name"/>
+   </association>
+ 
+ </resultMap>
+ 
+ <select id="selects" resultMap="articleResultMap">
+    select a.*,u.username ,c.name as channel_name,cat.`name` as category_name from cms_article a left  join cms_user u on a.user_id =u.id LEFT JOIN cms_channel c on a.channel_id = c.id 
+ LEFT JOIN cms_category cat on a.category_id =cat.id
+   
+   <where>
+    <!-- 按照用户查询 -->
+     <if test="userId!=null">
+      a.user_id =#{userId}
+     </if>
+     <!-- 按照审核状态查询 -->
+     <if test="status!=null">
+      and a.status =#{status}
+     </if>
+       <!-- 按照标题查询 -->
+     <if test="title!=null">
+      and a.title like "%" #{title} "%"
+     </if>
+     <!-- 按照栏目查询 -->
+     <if test="channelId!=null">
+      and a.channel_id =#{channelId}
+     </if>
+     <!-- 按照分类查询 -->
+     <if test="categoryId!=null">
+      and a.category_id =#{categoryId}
+     </if>
+     <!-- 显示热点文章 -->
+     <if test="hot!=null">
+      and hot =#{hot}
+     </if>
+   </where>
+   
+   order by created desc
+ </select>
+ <update id="update">
+ 
+  update cms_article 
+  
+  <trim prefix="set" suffixOverrides="," suffix=" where id=#{id}">
+			<if test="hot!=null">
+				hot =#{hot},
+			</if>
+			<if test="status!=null">
+				status =#{status},
+			</if>
+
+		</trim>
+ 
+ </update>
+    
+    
+    
+    </mapper>

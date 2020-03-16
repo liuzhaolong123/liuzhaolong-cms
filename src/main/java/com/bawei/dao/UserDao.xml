@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+     
+   <mapper namespace="com.bawei.dao.UserDao">
+   
+   <select id="selectByUsername" resultType="User">
+   
+   select  *  from  cms_user where username =#{username}
+   
+   </select>
+   
+   <insert id="insert">
+   
+   insert  into  cms_user(username,password,gender,nickname,birthday,locked,created)
+   values (#{username},#{password},#{gender},#{nickname},#{birthday},#{locked},#{created})
+   
+   </insert>
+   
+   <select id="selects" resultType="User">
+		select * from cms_user
+		<where>
+			<if test="username!=null and username!=''">
+				username like "%" #{username}
+
+			</if>
+			<if test="locked!=null and locked!=''">
+				locked = #{locked}
+			</if>
+
+		</where>
+     order by created desc
+      
+	</select>
+	
+	
+	<update id="update">
+	
+	update cms_user set  locked =#{locked} where id =#{id}
+	
+	</update>
+   
+   </mapper>
